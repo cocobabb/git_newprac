@@ -13,3 +13,11 @@ jobs:
     steps:
       - name: Print hello world
         run: echo 'Hello World'
+
+  hello-secret:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Print Secret
+        # run: echo '${{secrets.[시크릿 이름]}}'
+        run: echo '${{secrets.MY_SECRET}}'

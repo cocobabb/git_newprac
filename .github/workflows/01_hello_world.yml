@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
 
 jobs:
   hello_world:
@@ -12,4 +13,3 @@ jobs:
     steps:
       - name: Print hello world
         run: echo 'Hello World'
-        

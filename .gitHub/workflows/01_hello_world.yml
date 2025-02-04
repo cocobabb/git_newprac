@@ -6,10 +6,9 @@ on:
       - main
 
 jobs:
-  hello-world:
+  hello_world:
     runs-on: ubuntu-24.04
 
   steps:
     - name: Print hello world
       run: echo 'Hello World'
-      

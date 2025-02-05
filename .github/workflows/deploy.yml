@@ -82,7 +82,7 @@ jobs:
           username: ${{secrets.SSH_USERNAME}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: ${{secrets.SSH_PORT}}
-          script:
+          script: |
             #  - name: Copy .env / docker-compose.yml의
             # target: "~/work-directory" 경로 같아야 함
             cd ~/work-directory

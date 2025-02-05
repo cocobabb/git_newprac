@@ -23,7 +23,7 @@ jobs:
       - name: Add remote server Fingerprint to known Hosts
         run: ssh-keyscan -H -p ${{secrets.SSH_PORT}} ${{secrets.SSH_HOST}} >> ~/.ssh/known_hosts || true
 
-# - name: create file on remote server
+      # - name: create file on remote server
       #   run: ssh -p ${{secrets.SSH_PORT}} ${{secrets.SSH_USERNAME}}@${{secrets.SSH_HOST}} "touch 'hello-world.txt'"
 
       # - name: copy file to remote server
@@ -44,8 +44,7 @@ jobs:
       #       touch 'hello-world3.txt'
       # => 깃허브에 액션 시크릿으로 처리함
 
-
-        # 환경 변수 파일 생성
+      # 환경 변수 파일 생성
       - name: Create .env file
         run: |
           echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
@@ -57,11 +56,11 @@ jobs:
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
           echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
 
-        - name: Docker Image Build
-          run: docker compose build
+      - name: Docker Image Build
+        run: docker compose build
 
-        - name: Login DockerHub
-          run: echo '${{secrets.DOCKER_PASSWORD}}' | docker login -u '${{secrets.DOCKER_USERNAME}}' --password-stdin
-      
-        - name: Docker Image Push
-          run: docker compose push
+      - name: Login DockerHub
+        run: echo '${{secrets.DOCKER_PASSWORD}}' | docker login -u '${{secrets.DOCKER_USERNAME}}' --password-stdin
+
+      - name: Docker Image Push
+        run: docker compose push

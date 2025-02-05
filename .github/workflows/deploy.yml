@@ -1,0 +1,67 @@
+name: deploy service
+
+on:
+  push: # 워크플로우 실행조건 이벤트
+    branches: # 워크플로우 실행 조건 브랜치
+      - main
+
+jobs:
+  ssh-agent: # Job 이름
+    runs-on: ubuntu-24.04 # GitHub 워크스페이스 환경
+
+    steps: # 실행할 작업
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: run ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
+
+        # 원격 서버를 신뢰할 수 있는 서버로 등록하는 과정
+        # known_hosts : 원격 서버들의 지문이 저장된 파일
+      - name: Add remote server Fingerprint to known Hosts
+        run: ssh-keyscan -H -p ${{secrets.SSH_PORT}} ${{secrets.SSH_HOST}} >> ~/.ssh/known_hosts || true
+
+# - name: create file on remote server
+      #   run: ssh -p ${{secrets.SSH_PORT}} ${{secrets.SSH_USERNAME}}@${{secrets.SSH_HOST}} "touch 'hello-world.txt'"
+
+      # - name: copy file to remote server
+      #   run: scp -P ${{secrets.SSH_PORT}} README.md ${{secrets.SSH_USERNAME}}@${{secrets.SSH_HOST}}:~/
+
+      # # GitHub Actions에서 SSH(Secure Copy Protocol을 사용해서 파일을 원격 서버에 복사하기 위한 도구) 연결을 통해 원격 서버에 명령어를 실행하기 위한 도구
+      # - name: Run remote command test
+      #   uses: appleboy/ssh-action@v1.2.0
+      #   with:
+      #     host: ${{ secrets.SSH_HOST}}
+      #     username: ${{ secrets.SSH_USERNAME}}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     port: ${{ secrets.SSH_PORT}}
+      #     #  SSH 연결로 순차적으로 실행할 명령어 목록
+      #     script: |
+      #       touch 'hello-world1.txt'
+      #       touch 'hello-world2.txt'
+      #       touch 'hello-world3.txt'
+      # => 깃허브에 액션 시크릿으로 처리함
+
+
+        # 환경 변수 파일 생성
+      - name: Create .env file
+        run: |
+          echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+          echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> .env
+          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+
+        - name: Docker Image Build
+          run: docker compose build
+
+        - name: Login DockerHub
+          run: echo '${{secrets.DOCKER_PASSWORD}}' | docker login -u '${{secrets.DOCKER_USERNAME}}' --password-stdin
+      
+        - name: Docker Image Push
+          run: docker compose push

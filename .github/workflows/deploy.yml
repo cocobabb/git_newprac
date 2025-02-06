@@ -29,7 +29,7 @@ jobs:
       # - name: copy file to remote server
       #   run: scp -P ${{secrets.SSH_PORT}} README.md ${{secrets.SSH_USERNAME}}@${{secrets.SSH_HOST}}:~/
 
-      # # GitHub Actions에서 SSH(Secure Copy Protocol을 사용해서 파일을 원격 서버에 복사하기 위한 도구) 연결을 통해 원격 서버에 명령어를 실행하기 위한 도구
+      # # GitHub Actions에서 SSH(Secure Copy Protocol : 파일을 원격 서버에 복사하기 위한 도구)을 사용해서 연결을 통해 원격 서버에 명령어를 실행하기 위한 도구
       # - name: Run remote command test
       #   uses: appleboy/ssh-action@v1.2.0
       #   with:
@@ -62,7 +62,7 @@ jobs:
       - name: Login DockerHub
         run: echo '${{secrets.DOCKER_PASSWORD}}' | docker login -u '${{secrets.DOCKER_USERNAME}}' --password-stdin
 
-      - name: Docker Image Push
+         - name: Docker Image Push
         run: docker compose push
 
       - name: Copy .env / docker-compose.yml
@@ -84,8 +84,11 @@ jobs:
           port: ${{secrets.SSH_PORT}}
           script: |
             #  - name: Copy .env / docker-compose.yml의
-            # target: "~/work-directory" 경로 같아야 함
+            # target: "~/work-directory" 와 경로 같아야 함
             cd ~/work-directory
+            # docker-compose에서 이미지 가져오기 
             docker-compose pull
+            # 컨테이너를 삭제
             docker-compose down
+            # 컨테이너를 없으면 생성하고 실행
             docker-compose up -d

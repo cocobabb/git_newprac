@@ -107,7 +107,7 @@ jobs:
         with:
           webhook: ${{secrets.DISCORD_WEBHOOK}}
           title:
-            "배포 시작"
+            "배포 성공😊"
 
             #액션 실패 알림 메세지
       - name: Start Message - Fail
@@ -115,4 +115,4 @@ jobs:
         if: failure()
         with:
           webhook: ${{secrets.DISCORD_WEBHOOK}}
-          title: "배포 시작"
+          title: "배포 실패😢"

@@ -20,6 +20,14 @@ jobs:
           webhook: ${{secrets.DISCORD_WEBHOOK}}
           title: "배포 시작"
 
+        # 캐시 저장 설정을 위한 action(라이브러리)
+        - name: Cache Docker Image Layer
+        # actions/cache: 깃허브 캐시 저장소 활용을 위한 라이브러리
+          uses: actions/cache@v4.2.0
+          with:
+            path: /tmp/.buildx-cache
+            key: docker-image-layer-cache
+
       - name: run ssh-agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -63,8 +71,22 @@ jobs:
           echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
           echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
 
+      # 도커 BuildKit 엔진 설정 aciton(라이브러리) => 캐시를 내가 관리하기 위해서
+      - name: Set up Docker BuildKit
+       # setup-buildx-action
+       # - 워크스페이스에 Buildkit을 설치하는 action(라이브러리)
+       # buildx = BuildKit
+        uses: docker/setup-buildx-action@v3
+
+      # BuildKit 엔진 빌더(이미지 빌드를 도와주는 도구)생성
+      # 기존 Docker 빌더: 캐시 파일 저장&불러오기 경로 제어 불가
+      - name: Create Buildkit 빌더
+        run: |
+          docker buildx create --use --name buildkit #buildkit 빌더를 생성하는 명력어
+          docker buildx use buildkit #빌더(buildkit) 설정 명령어
+
       - name: Docker Image Build
-        run: docker compose build
+        run: docker compose -f docker-compose-actions-cache.yml build --build-arg BUILDKIT_INLINE_CACHE=1
 
       - name: Login DockerHub
         run: echo '${{secrets.DOCKER_PASSWORD}}' | docker login -u '${{secrets.DOCKER_USERNAME}}' --password-stdin
@@ -72,14 +94,14 @@ jobs:
       - name: Docker Image Push
         run: docker compose push
 
-      - name: Copy .env / docker-compose.yml
+      - name: Copy .env / docker-compose-actions-cache.yml
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{secrets.SSH_HOST}}
           username: ${{secrets.SSH_USERNAME}}
           key: ${{secrets.SSH_PRIVATE_KEY}}
           port: ${{secrets.SSH_PORT}}
-          source: "docker-compose.yml,.env"
+          source: "docker-compose-actions-cache.yml,.env"
           target: "~/work-directory"
 
       - name: Pull Image & Up Container
@@ -94,13 +116,13 @@ jobs:
             # target: "~/work-directory" 와 경로 같아야 함
             cd ~/work-directory
             # docker-compose에서 이미지 가져오기 
-            docker-compose pull
+            docker-compose -f docker-compose-actions-cache.yml pull
             # 컨테이너를 삭제
-            docker-compose down
+            docker-compose -f docker-compose-actions-cache.yml down
             # 컨테이너를 없으면 생성하고 실행
-            docker-compose up -d
+            docker-compose -f docker-compose-actions-cache.yml up -d
 
-        #액션 성공 알림 메세지
+        #액션 배포 성공 알림 메세지
       - name: Start Message - Success
         uses: sarisia/actions-status-discord@v1
         if: success()
@@ -109,7 +131,7 @@ jobs:
           title:
             "배포 성공😊"
 
-            #액션 실패 알림 메세지
+        #액션 배포 실패 알림 메세지
       - name: Start Message - Fail
         uses: sarisia/actions-status-discord@v1
         if: failure()

@@ -17,7 +17,7 @@ jobs:
       - name: Start Message
         uses: sarisia/actions-status-discord@v1
         with:
-          webhook: ${{secrets.DISCORD_WEBHHOK}}
+          webhook: ${{secrets.DISCORD_WEBHOOK}}
           title: "배포 시작"
 
       - name: run ssh-agent
@@ -99,3 +99,20 @@ jobs:
             docker-compose down
             # 컨테이너를 없으면 생성하고 실행
             docker-compose up -d
+
+        #액션 성공 알림 메세지
+      - name: Start Message - Success
+        uses: sarisia/actions-status-discord@v1
+        if: success()
+        with:
+          webhook: ${{secrets.DISCORD_WEBHHOK}}
+          title:
+            "배포 시작"
+
+            #액션 실패 알림 메세지
+      - name: Start Message - Fail
+        uses: sarisia/actions-status-discord@v1
+        if: failure()
+        with:
+          webhook: ${{secrets.DISCORD_WEBHHOK}}
+          title: "배포 시작"

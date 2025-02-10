@@ -23,7 +23,7 @@ pipeline {
                 }
             }
           }
-    }
+        }
         
         stage("Copy Environment Variable File") {
             steps {
@@ -64,14 +64,6 @@ pipeline {
 				    echo '항상 실행된다.'
 		    }
 		    
-		    success {
-				    echo '성공 시 실행된다.'
-		    }
-		    
-		    failure {
-				    echo '실패 시 실행된다.'
-		    }
-
         success {
               withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
                           discordSend description: """
@@ -83,8 +75,9 @@ pipeline {
                           title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공😘", 
                           webhookURL: "$discord_webhook"
               }
-          }
-          failure {
+        }
+
+        failure {
               withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
                           discordSend description: """
                           제목 : ${currentBuild.displayName}
@@ -95,7 +88,7 @@ pipeline {
                           title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패😒", 
                           webhookURL: "$discord_webhook"
               }
-          }
+        }
     }
 
 } 

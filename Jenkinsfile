@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     stages {
-          stages { 
-      stage('Build Start') {
-        steps {
+        stage('Build Start') {
+          steps {
             script {
               // Jenkins Credentials에서 Secret Text 가져오기
               // credentialsId : credentials 생성 당시 작성한 
@@ -23,8 +22,8 @@ pipeline {
                     webhookURL: "$discord_webhook"
                 }
             }
-        }
-      }
+          }
+    }
         
         stage("Copy Environment Variagble File") {
             steps {

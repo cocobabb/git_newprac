@@ -65,7 +65,7 @@ pipeline {
 		    }
 		    
         success {
-              withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
+  withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
                           discordSend description: """
                           제목 : ${currentBuild.displayName}
                           결과 : ${currentBuild.currentResult}

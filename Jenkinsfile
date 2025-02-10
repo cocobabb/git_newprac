@@ -18,7 +18,7 @@ pipeline {
                     Jenkins Build Start
                     """,
                     link: env.BUILD_URL, 
-                    title: "${env.JOB_NAME} : ${currentBuild.displayName} 시작", 
+                    title: "${env.JOB_NAME} : ${currentBuild.displayName} 시작😁", 
                     webhookURL: "$discord_webhook"
                 }
             }

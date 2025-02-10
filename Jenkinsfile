@@ -25,12 +25,14 @@ pipeline {
                 }
             } 
         }
-        
-        stage('Test'){
-		        steps{
-				        echo '애플리케이션 테스트'
-		        }
-        }
+        stage("Docker Image Build & Container Run") {
+          steps {
+            script{
+              sh 'docker compose build'
+              sh 'docker compose up -d'
+            }
+          }
+        }        
     }
     
     post {

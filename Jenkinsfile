@@ -72,4 +72,31 @@ pipeline {
 				    echo '실패 시 실행된다.'
 		    }
     }
+
+  post {
+          success {
+              withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
+                          discordSend description: """
+                          제목 : ${currentBuild.displayName}
+                          결과 : ${currentBuild.currentResult}
+                          실행 시간 : ${currentBuild.duration / 1000}s
+                          """,
+                          link: env.BUILD_URL, result: currentBuild.currentResult, 
+                          title: "${env.JOB_NAME} : ${currentBuild.displayName} 성공😘", 
+                          webhookURL: "$discord_webhook"
+              }
+          }
+          failure {
+              withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
+                          discordSend description: """
+                          제목 : ${currentBuild.displayName}
+                          결과 : ${currentBuild.currentResult}
+                          실행 시간 : ${currentBuild.duration / 1000}s
+                          """,
+                          link: env.BUILD_URL, result: currentBuild.currentResult, 
+                          title: "${env.JOB_NAME} : ${currentBuild.displayName} 실패😒", 
+                          webhookURL: "$discord_webhook"
+              }
+          }
+      }
 } 

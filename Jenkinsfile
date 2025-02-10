@@ -25,7 +25,7 @@ pipeline {
           }
     }
         
-        stage("Copy Environment Variagble File") {
+        stage("Copy Environment Variable File") {
             steps {
 	              script{
                   // withCredentials : Credentials  서비스를 활용하겠다.
@@ -71,10 +71,8 @@ pipeline {
 		    failure {
 				    echo '실패 시 실행된다.'
 		    }
-    }
 
-  post {
-          success {
+        success {
               withCredentials([string(credentialsId: 'discord-webhook', variable: 'discord_webhook')]) {
                           discordSend description: """
                           제목 : ${currentBuild.displayName}
@@ -98,5 +96,6 @@ pipeline {
                           webhookURL: "$discord_webhook"
               }
           }
-      }
+    }
+
 } 

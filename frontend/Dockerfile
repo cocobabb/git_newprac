@@ -12,7 +12,7 @@ RUN npm run build
 FROM nginx:mainline-alpine-slim
 COPY --from=build /app/dist /usr/share/nginx/html
 # 모듈화된 서버 설정 파일을 컨테이너로 복사
-# COPY ./conf.d /etc/nginx/conf.d
+# COPY ./conf.d /etc/nginx/conf.d #>> 해당 폴더 삭제, templates폴더 파일들로 작동할 것임
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY ./templates /etc/nginx/templates
 

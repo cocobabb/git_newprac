@@ -122,6 +122,8 @@ jobs:
             docker-compose -f docker-compose-actions-cache.yml down
             # 컨테이너를 없으면 생성하고 실행
             docker-compose -f docker-compose-actions-cache.yml up -d
+            # 이미지 기반 컨테이너가 없는 이미지 삭제(강제로)
+            docker image prune -f
 
         #액션 배포 성공 알림 메세지
       - name: Start Message - Success
